@@ -73,7 +73,7 @@
     <PostDeploy Include="Post-Deploy.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GildedRose.Membership.publish.xml" />
+    <None Include="GildedRose.Membership.LocalDb.publish.xml" />
     <Build Include="Schema\membership.sql" />
     <Build Include="Tables\Users.sql" />
     <Build Include="UserDefinedTypes\PWD.sql" />
@@ -88,6 +88,7 @@
     <Build Include="UserDefinedTypes\State.sql" />
     <Build Include="UserDefinedTypes\PostalCode.sql" />
     <None Include="PostDeploy\Membership.Organization.sql" />
+    <None Include="GildedRose.Membership.AWS.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="StoredProcedures\CreateAccount.sql" />

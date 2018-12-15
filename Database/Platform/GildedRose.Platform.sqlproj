@@ -76,7 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Items.sql" />
-    <None Include="GildedRose.Platform.publish.xml" />
+    <None Include="GildedRose.Platform.LocalDb.publish.xml" />
     <None Include="PostDeploy\Inventory.ItemsOnHand.sql" />
     <Build Include="Storage\Inventory.sql" />
     <Build Include="UserDefinedTypes\PWD.sql" />
@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeploy\Inventory.Categories.sql" />
+    <None Include="GildedRose.Platform.AWS.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\ItemsOnHand.sql" />
