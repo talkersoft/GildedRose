@@ -64,6 +64,10 @@
     <Folder Include="Storage" />
     <Folder Include="UserDefinedTypes" />
     <Folder Include="Functions" />
+    <Folder Include="Security" />
+    <Folder Include="Security\Logins" />
+    <Folder Include="Security\Roles" />
+    <Folder Include="Security\Users" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deploy.sql" />
@@ -91,5 +95,9 @@
     <Build Include="Storage\logs.sql" />
     <Build Include="Tables\SQLException.sql" />
     <Build Include="Tables\ApiLog.sql" />
+    <Build Include="PostDeploy\GrantPermissions.sql" />
+    <Build Include="Security\Logins\webProcessLogin.sql" />
+    <Build Include="Security\Roles\webProcessRole.sql" />
+    <Build Include="Security\Users\webProcessUser.sql" />
   </ItemGroup>
 </Project>

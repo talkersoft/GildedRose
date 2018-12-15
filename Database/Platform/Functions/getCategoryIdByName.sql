@@ -1,4 +1,4 @@
-﻿CREATE FUNCTION [dbo].[getCategoryIdByName](@CategoryName VARCHAR(100))
+﻿CREATE FUNCTION [inventory].[getCategoryIdByName](@CategoryName VARCHAR(100))
 RETURNS INT
 AS
 BEGIN

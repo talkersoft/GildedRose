@@ -1,4 +1,4 @@
-﻿CREATE FUNCTION [dbo].[getItemIdentifierByName](@ItemName VARCHAR(100))
+﻿CREATE FUNCTION [inventory].[getItemIdentifierByName](@ItemName VARCHAR(100))
 RETURNS UNIQUEIDENTIFIER
 AS
 BEGIN

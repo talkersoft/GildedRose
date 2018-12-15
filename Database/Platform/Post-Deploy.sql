@@ -13,3 +13,5 @@ Post-Deployment Script Template
 :r .\PostDeploy\Inventory.Categories.sql
 :r .\PostDeploy\Inventory.Items.sql
 :r .\PostDeploy\Inventory.ItemsOnHand.sql
+:r .\PostDeploy\GrantPermissions.sql
+

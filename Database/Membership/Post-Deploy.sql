@@ -11,3 +11,4 @@ Post-Deployment Script Template
 */
 :r .\PostDeploy\Membership.Organization.sql
 :r .\PostDeploy\Membership.Users.sql
+:r .\PostDeploy\GrantPermissions.sql
