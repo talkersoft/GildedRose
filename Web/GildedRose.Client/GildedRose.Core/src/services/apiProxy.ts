@@ -8,7 +8,7 @@ axios.defaults.headers.Pragma = "no-cache";
 axios.defaults.headers.Expires = "0";
 
 export async function get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  url = `/api/${url}`;
+  url = `api${url}`;
   try {
     axios.defaults.headers.common.Authorization = getHeader();
     const response = await axios.get(url, config);
@@ -27,7 +27,7 @@ export async function get<T>(url: string, config?: AxiosRequestConfig): Promise<
 }
 
 export async function post<T>(url: string, data: {}, config?: AxiosRequestConfig): Promise<T> {
-  url = `/api/${url}`;
+  url = `api${url}`;
   try {
     axios.defaults.headers.common.Authorization = getHeader();
     const response = await axios.post(url, data, config);
@@ -46,7 +46,7 @@ export async function post<T>(url: string, data: {}, config?: AxiosRequestConfig
 }
 
 export async function put<T>(url: string, data: {}, config?: AxiosRequestConfig): Promise<T> {
-  url = `/api/${url}`;
+  url = `api${url}`;
   try {
     const response = await axios.put(url, data, config);
     return response.data;
@@ -64,7 +64,7 @@ export async function put<T>(url: string, data: {}, config?: AxiosRequestConfig)
 }
 
 export async function patch<T>(url: string, data: {}, config?: AxiosRequestConfig): Promise<T> {
-  url = `/api/${url}`;
+  url = `api${url}`;
   try {
     const response = await axios.patch(url, data, config);
     return response.data;
@@ -82,7 +82,7 @@ export async function patch<T>(url: string, data: {}, config?: AxiosRequestConfi
 }
 
 export async function remove<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  url = `/api/${url}`;
+  url = `api${url}`;
   try {
     const response = await axios.delete(url, config);
     return response.data;
@@ -110,5 +110,5 @@ function navigateToLogout(): void {
 }
 
 function navigateToError(e: Error): void {
-  window.location.assign("/");
+  alert("An unhandled excption has occured.");
 }
