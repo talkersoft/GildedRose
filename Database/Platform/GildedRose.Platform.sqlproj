@@ -108,6 +108,7 @@
   <ItemGroup>
     <None Include="PostDeploy\Inventory.Categories.sql" />
     <None Include="GildedRose.Platform.AWS.publish.xml" />
+    <None Include="GildedRose.Platform.VM.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\ItemsOnHand.sql" />

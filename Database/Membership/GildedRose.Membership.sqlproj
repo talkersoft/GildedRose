@@ -89,6 +89,7 @@
     <Build Include="UserDefinedTypes\PostalCode.sql" />
     <None Include="PostDeploy\Membership.Organization.sql" />
     <None Include="GildedRose.Membership.AWS.publish.xml" />
+    <None Include="GildedRose.Membership.VM.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="StoredProcedures\CreateAccount.sql" />
