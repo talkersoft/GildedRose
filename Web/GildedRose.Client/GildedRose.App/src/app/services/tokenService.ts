@@ -6,5 +6,5 @@ export async function getToken(username: string, password: string): Promise<Toke
     username: username,
     password: password,
   };
-  return await proxy.post<TokenResponse>("/Token/createtoken", data);
+  return await proxy.post<TokenResponse>("/api/Token/createtoken", data);
 }

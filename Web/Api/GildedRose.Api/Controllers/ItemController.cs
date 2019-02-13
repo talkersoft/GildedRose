@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GildedRose.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ItemController : ControllerBase
     {
@@ -26,7 +26,7 @@ namespace GildedRose.Api.Controllers
                 return this.Ok(allItems);
             }
 
-            return this.BadRequest();
+            return this.NotFound();
         }
 
         [HttpGet]

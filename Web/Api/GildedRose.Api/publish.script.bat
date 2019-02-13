@@ -1,0 +1,1 @@
+﻿dotnet publish --framework netcoreapp2.1 --output "C:\src\GildedRose\Web\Api\publish" --configuration Release
