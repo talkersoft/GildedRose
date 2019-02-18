@@ -8,10 +8,10 @@ axios.defaults.headers.Pragma = "no-cache";
 axios.defaults.headers.Expires = "0";
 
 export async function get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  url = `api${url}`;
+  const resource = url.startsWith("/") ? `/api${url}` : `/api/${url}`;
   try {
     axios.defaults.headers.common.Authorization = getHeader();
-    const response = await axios.get(url, config);
+    const response = await axios.get(resource, config);
     return response.data;
   } catch (e) {
     if (e.response.status === 401) {
@@ -27,10 +27,10 @@ export async function get<T>(url: string, config?: AxiosRequestConfig): Promise<
 }
 
 export async function post<T>(url: string, data: {}, config?: AxiosRequestConfig): Promise<T> {
-  url = `api${url}`;
+  const resource = url.startsWith("/") ? `/api${url}` : `/api/${url}`;
   try {
     axios.defaults.headers.common.Authorization = getHeader();
-    const response = await axios.post(url, data, config);
+    const response = await axios.post(resource, data, config);
     return response.data;
   } catch (e) {
     if (e.response.status === 401) {
@@ -46,9 +46,9 @@ export async function post<T>(url: string, data: {}, config?: AxiosRequestConfig
 }
 
 export async function put<T>(url: string, data: {}, config?: AxiosRequestConfig): Promise<T> {
-  url = `api${url}`;
+  const resource = url.startsWith("/") ? `/api${url}` : `/api/${url}`;
   try {
-    const response = await axios.put(url, data, config);
+    const response = await axios.put(resource, data, config);
     return response.data;
   } catch (e) {
     if (e.response.status === 401) {
@@ -64,9 +64,9 @@ export async function put<T>(url: string, data: {}, config?: AxiosRequestConfig)
 }
 
 export async function patch<T>(url: string, data: {}, config?: AxiosRequestConfig): Promise<T> {
-  url = `api${url}`;
+  const resource = url.startsWith("/") ? `/api${url}` : `/api/${url}`;
   try {
-    const response = await axios.patch(url, data, config);
+    const response = await axios.patch(resource, data, config);
     return response.data;
   } catch (e) {
     if (e.response.status === 401) {
@@ -82,9 +82,9 @@ export async function patch<T>(url: string, data: {}, config?: AxiosRequestConfi
 }
 
 export async function remove<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  url = `api${url}`;
+  const resource = url.startsWith("/") ? `/api${url}` : `/api/${url}`;
   try {
-    const response = await axios.delete(url, config);
+    const response = await axios.delete(resource, config);
     return response.data;
   } catch (e) {
     if (e.response.status === 401) {
