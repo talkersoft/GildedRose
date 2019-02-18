@@ -8,13 +8,13 @@ webpackSettings.devServer = {
     index: '/gildedrose/'
   },
   proxy: {
-    '/api/*': {
+    '/api/**': {
       target: 'http://localhost:5000',
       ws: false,
       secure: false,
       changeOrigin: true,
     },
-    '/swagger/*': {
+    '/swagger/**': {
       target: 'http://localhost:5000',
       ws: false,
       secure: false,
