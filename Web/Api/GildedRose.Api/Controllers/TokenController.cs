@@ -10,7 +10,7 @@ using Serilog.Core.Enrichers;
 
 namespace GildedRose.Api.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class TokenController : Controller
     {
         private IdentityHelper auth;
