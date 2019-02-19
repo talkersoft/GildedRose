@@ -90,6 +90,7 @@
     <None Include="PostDeploy\Membership.Organization.sql" />
     <None Include="GildedRose.Membership.AWS.publish.xml" />
     <None Include="GildedRose.Membership.VM.publish.xml" />
+    <None Include="GildedRose.Publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="StoredProcedures\CreateAccount.sql" />
