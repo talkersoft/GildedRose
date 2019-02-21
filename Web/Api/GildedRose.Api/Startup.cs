@@ -103,7 +103,7 @@ namespace GildedRose.Api
                     {
                         o.Conventions.Add(new AddAuthorizeFiltersControllerConvention());
                     })
-                    .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1)
+                    .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
                     .AddFluentValidation(x => x.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
 
                 services

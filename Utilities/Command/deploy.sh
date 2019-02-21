@@ -5,6 +5,12 @@ function deployPlatform() {
     BLUE='\033[1;34m'
     NC='\033[0m' # No Color
     sqlPackage=/C/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/150/SqlPackage.exe
+    sqlPackage=/C/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/Professional/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/150/SqlPackage.exe
+    
+    #test -f "/C/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/150/SqlPackage.exe"
+    #if [$?]; then
+    #    sqlPackage=/C/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/150/SqlPackage.exe
+    #fi
 
     printf "${BLUE}Publishing Platform Database${NC}\n"
     #appDir=$(cygpath -aw ./../../)
@@ -23,6 +29,7 @@ function deployMembership() {
     BLUE='\033[1;34m'
     NC='\033[0m' # No Color
     sqlPackage=/C/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/150/SqlPackage.exe
+    sqlPackage=/C/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/Professional/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/150/SqlPackage.exe
     
     printf "${BLUE}Publishing Membership Database${NC}\n"
     #appDir=$(cygpath -aw ./../../)
