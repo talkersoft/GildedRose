@@ -98,6 +98,10 @@
     <Build Include="Security\Roles\webProcessRole.sql" />
     <Build Include="Security\Users\webProcessUser.sql" />
     <None Include="PostDeploy\GrantPermissions.sql" />
+    <Build Include="Tables\Patrons.sql" />
+    <Build Include="Schema\operations.sql" />
+    <Build Include="UserDefinedTypes\Phone.sql" />
+    <Build Include="Storage\operations.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Schema\inventory.sql" />
