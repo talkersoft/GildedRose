@@ -8,6 +8,7 @@
     <CodeAnalysisRuleSet>..\..\..\Analyzers\Stylecop.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisAdditionalOptions>..\..\..\Analyzers\stylecop.json</CodeAnalysisAdditionalOptions>
     <StartupObject>GildedRose.Api.Program</StartupObject>
+    <UserSecretsId>8ab8f2af-e432-4054-b8be-ca2ff720c4fd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
