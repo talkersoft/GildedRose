@@ -21,6 +21,8 @@ using GildedRose.Membership.Data;
 using Microsoft.EntityFrameworkCore;
 using GildedRose.Membership.Filters;
 using Serilog;
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace GildedRose.Api
 {
@@ -106,6 +108,11 @@ namespace GildedRose.Api
                     .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
                     .AddFluentValidation(x => x.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
 
+                services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.KnownProxies.Add(IPAddress.Parse("127.0.0.1"));
+                });
+
                 services
                     .AddAuthorization(o =>
                     {
@@ -161,6 +168,11 @@ namespace GildedRose.Api
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            });
 
             //app.UseMiddleware<UserContextMiddleware>();
             app.UseAuthentication();
