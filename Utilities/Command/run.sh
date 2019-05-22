@@ -6,6 +6,11 @@ function runApi() {
     start cmd.exe //C dotnet watch -v run
 }
 
+function runWeb() {
+    cd /c/src/samples/GildedRose/Web/GildedRose.Client/GildedRose.App
+    start cmd.exe //C yarn run server
+}
+
 while :
 do
     echo "API"
@@ -18,6 +23,8 @@ do
 
     if [ $response == "api" ]; then
         runApi   
+    elif [ $response == "web" ]; then
+        runWeb  
     elif [ $response == "exit" ] || [ $response == "quit" ]; then
         exit 0
     else
