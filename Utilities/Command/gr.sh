@@ -1,27 +1,22 @@
-#!/bin/bash 
-appDir=$(cygpath -aw ./../../)
+#!/bin/zsh 
+appDir=./../../
 
 while :
 do
     echo "BUILD"
-    echo "DEPLOY"
     echo "RUN"
     echo "Exit"
 
-    read -p "Select option:`echo $'\n> '`" -r
-    echo
-    response="${REPLY,,}"
+    vared -p 'Please Type Command: ' -c response
 
-    if [ $response == "build" ]; then
+    if [[ $response == "build" ]]; then
         clear
+        echo calling build script
         ./build.sh $appDir
-    elif [ $response == "run" ]; then
+    elif [[ $response == "run" ]]; then
         clear
         ./run.sh $appDir
-    elif [ $response == "deploy" ]; then
-        clear
-        ./deploy.sh $appDir
-    elif [ $response == "exit" ] || [ $response == "quit" ]; then
+    elif [[ $response == "exit" ]] || [[ $response == "quit" ]]; then
         exit 0                
     else
         echo "App $response not found"
