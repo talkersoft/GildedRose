@@ -10,8 +10,6 @@ do
     vared -p 'Please Type Command: ' -c response
 
     if [[ $response == "build" ]]; then
-        clear
-        echo calling build script
         ./build.sh $appDir
     elif [[ $response == "run" ]]; then
         clear
