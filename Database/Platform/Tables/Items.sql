@@ -9,7 +9,7 @@
     [CreatedBy] [AuditUser] NOT NULL, 
 	[Modified] [AuditDate] NULL,
     [ModifiedBy] [AuditUser] NULL, 
-    CONSTRAINT [PK_ItemIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) on [inventory],
+    CONSTRAINT [PK_ItemIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC),
 	CONSTRAINT [FK_Items_Category] FOREIGN KEY ([Category]) REFERENCES [inventory].[Categories]([Id]), 
 );
 
@@ -17,7 +17,6 @@ GO
 
 CREATE UNIQUE NONCLUSTERED INDEX [UIX_inventory_item_name]
     ON [inventory].[Items]([Name] ASC)
-    ON [inventory];
 
 GO
 

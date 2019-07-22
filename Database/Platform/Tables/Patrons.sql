@@ -15,12 +15,11 @@
     [CreatedBy] [AuditUser] NOT NULL, 
 	[Modified] [AuditDate] NULL,
     [ModifiedBy] [AuditUser] NULL, 
-    CONSTRAINT [PK_PatronIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) on [operations],
+    CONSTRAINT [PK_PatronIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC)
 );
 
 GO
 
 CREATE UNIQUE NONCLUSTERED INDEX [UIX_inventory_item_name]
-    ON [operations].[Patrons]([LastName], [FirstName] ASC)
-    ON [operations];
+    ON [operations].[Patrons]([LastName], [FirstName] ASC);
 GO
