@@ -15,8 +15,8 @@ SET NUMERIC_ROUNDABORT OFF;
 GO
 :setvar DatabaseName "GildedRose.Membership"
 :setvar DefaultFilePrefix "GildedRose.Membership"
-:setvar DefaultDataPath "d:\MSSQL\Data\"
-:setvar DefaultLogPath "d:\MSSQL\Data\"
+:setvar DefaultDataPath ""
+:setvar DefaultLogPath ""
 
 GO
 :on error exit
@@ -51,38 +51,7 @@ END
 GO
 PRINT N'Creating $(DatabaseName)...'
 GO
-CREATE DATABASE [$(DatabaseName)]
-    ON 
-    PRIMARY(NAME = [$(DatabaseName)], FILENAME = N'$(DefaultDataPath)$(DefaultFilePrefix)_Primary.mdf')
-    LOG ON (NAME = [$(DatabaseName)_log], FILENAME = N'$(DefaultLogPath)$(DefaultFilePrefix)_Primary.ldf') COLLATE SQL_Latin1_General_CP1_CI_AS
-GO
-PRINT N'Creating [logs]...';
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILEGROUP [logs];
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILE (NAME = [logs_1D7400D7], FILENAME = N'$(DefaultDataPath)$(DefaultFilePrefix)_logs_1D7400D7.mdf') TO FILEGROUP [logs];
-
-
-GO
-PRINT N'Creating [membership]...';
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILEGROUP [membership];
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILE (NAME = [membership_29E16213], FILENAME = N'$(DefaultDataPath)$(DefaultFilePrefix)_membership_29E16213.mdf') TO FILEGROUP [membership];
-
-
+CREATE DATABASE [$(DatabaseName)] COLLATE SQL_Latin1_General_CP1_CI_AS
 GO
 USE [$(DatabaseName)];
 
@@ -226,18 +195,7 @@ IF EXISTS (SELECT 1
            WHERE  [name] = N'$(DatabaseName)')
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
-            SET QUERY_STORE (QUERY_CAPTURE_MODE = ALL, DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_PLANS_PER_QUERY = 200, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 367), MAX_STORAGE_SIZE_MB = 100) 
-            WITH ROLLBACK IMMEDIATE;
-    END
-
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET QUERY_STORE = OFF 
+            SET QUERY_STORE (QUERY_CAPTURE_MODE = AUTO, OPERATION_MODE = READ_WRITE, DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_PLANS_PER_QUERY = 200, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), MAX_STORAGE_SIZE_MB = 100) 
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -272,6 +230,44 @@ IF EXISTS (SELECT 1
 GO
 IF fulltextserviceproperty(N'IsFulltextInstalled') = 1
     EXECUTE sp_fulltext_database 'enable';
+
+
+GO
+PRINT N'Creating [webProcessLogin]...';
+
+
+GO
+CREATE LOGIN [webProcessLogin]
+    WITH PASSWORD = N'HappyGoJoyBaby7732';
+
+
+GO
+PRINT N'Creating [webProcessUser]...';
+
+
+GO
+CREATE USER [webProcessUser] FOR LOGIN [webProcessLogin];
+
+
+GO
+REVOKE CONNECT TO [webProcessUser];
+
+
+GO
+PRINT N'Creating [webProcessRole]...';
+
+
+GO
+CREATE ROLE [webProcessRole]
+    AUTHORIZATION [dbo];
+
+
+GO
+PRINT N'Creating <unnamed>...';
+
+
+GO
+EXECUTE sp_addrolemember @rolename = N'webProcessRole', @membername = N'webProcessUser';
 
 
 GO
@@ -419,28 +415,6 @@ CREATE NONCLUSTERED INDEX [IX_SQLException_ProcedureName]
 
 
 GO
-PRINT N'Creating [membership].[Organization]...';
-
-
-GO
-CREATE TABLE [membership].[Organization] (
-    [Identifier] UNIQUEIDENTIFIER   NOT NULL,
-    [Name]       NVARCHAR (100)     NOT NULL,
-    [Address]    [dbo].[Address]    NULL,
-    [Address2]   [dbo].[Address]    NULL,
-    [City]       [dbo].[City]       NULL,
-    [State]      [dbo].[State]      NULL,
-    [PostalCode] [dbo].[PostalCode] NULL,
-    [AdminEmail] [dbo].[Email]      NOT NULL,
-    [Created]    [dbo].[AuditDate]  NOT NULL,
-    [CreatedBy]  [dbo].[AuditUser]  NOT NULL,
-    [Modified]   [dbo].[AuditDate]  NULL,
-    [ModifiedBy] [dbo].[AuditUser]  NULL,
-    CONSTRAINT [PK_OrganizationIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) ON [membership]
-);
-
-
-GO
 PRINT N'Creating [membership].[Users]...';
 
 
@@ -457,7 +431,7 @@ CREATE TABLE [membership].[Users] (
     [CreatedBy]              [dbo].[AuditUser] NOT NULL,
     [Modified]               [dbo].[AuditDate] NULL,
     [ModifiedBy]             [dbo].[AuditUser] NULL,
-    CONSTRAINT [PK_UserIdentifier] PRIMARY KEY CLUSTERED ([Id] ASC) ON [membership]
+    CONSTRAINT [PK_UserIdentifier] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
 
@@ -480,6 +454,28 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_Users_userName]
 
 
 GO
+PRINT N'Creating [membership].[Organization]...';
+
+
+GO
+CREATE TABLE [membership].[Organization] (
+    [Identifier] UNIQUEIDENTIFIER   NOT NULL,
+    [Name]       NVARCHAR (100)     NOT NULL,
+    [Address]    [dbo].[Address]    NULL,
+    [Address2]   [dbo].[Address]    NULL,
+    [City]       [dbo].[City]       NULL,
+    [State]      [dbo].[State]      NULL,
+    [PostalCode] [dbo].[PostalCode] NULL,
+    [AdminEmail] [dbo].[Email]      NOT NULL,
+    [Created]    [dbo].[AuditDate]  NOT NULL,
+    [CreatedBy]  [dbo].[AuditUser]  NOT NULL,
+    [Modified]   [dbo].[AuditDate]  NULL,
+    [ModifiedBy] [dbo].[AuditUser]  NULL,
+    CONSTRAINT [PK_OrganizationIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC)
+);
+
+
+GO
 PRINT N'Creating [logs].[DF_SQLException_ErrorDate]...';
 
 
@@ -489,20 +485,20 @@ ALTER TABLE [logs].[SQLException]
 
 
 GO
-PRINT N'Creating unnamed constraint on [membership].[Organization]...';
-
-
-GO
-ALTER TABLE [membership].[Organization]
-    ADD DEFAULT getutcdate() FOR [Created];
-
-
-GO
 PRINT N'Creating unnamed constraint on [membership].[Users]...';
 
 
 GO
 ALTER TABLE [membership].[Users]
+    ADD DEFAULT getutcdate() FOR [Created];
+
+
+GO
+PRINT N'Creating unnamed constraint on [membership].[Organization]...';
+
+
+GO
+ALTER TABLE [membership].[Organization]
     ADD DEFAULT getutcdate() FOR [Created];
 
 
@@ -584,6 +580,176 @@ END
 	THROW;
 END CATCH
 GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT CONNECT TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[logs] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[logs] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[logs] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[logs] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[logs] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[logs] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[membership] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[membership] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[membership] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[membership] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[membership] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[membership] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT DELETE
+    ON SCHEMA::[dbo] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT EXECUTE
+    ON SCHEMA::[dbo] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT INSERT
+    ON SCHEMA::[dbo] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT SELECT
+    ON SCHEMA::[dbo] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT UPDATE
+    ON SCHEMA::[dbo] TO [webProcessRole];
+
+
+GO
+PRINT N'Creating Permission...';
+
+
+GO
+GRANT VIEW DEFINITION
+    ON SCHEMA::[dbo] TO [webProcessRole];
+
+
+GO
 /*
 Post-Deployment Script Template							
 --------------------------------------------------------------------------------------
@@ -658,6 +824,40 @@ WHEN MATCHED
 				t.PasswordHash = s.PasswordHash
 WHEN NOT MATCHED BY SOURCE 
     THEN DELETE;
+GRANT CONNECT TO [webProcessRole]
+
+GO
+GRANT 
+	EXECUTE, 
+	SELECT,
+	INSERT,
+	UPDATE,
+	DELETE, 
+	VIEW DEFINITION ON 
+Schema::[dbo] TO [webProcessRole];
+
+GO
+GRANT 
+	EXECUTE, 
+	SELECT,
+	INSERT,
+	UPDATE,
+	DELETE, 
+	VIEW DEFINITION ON 
+Schema::[membership] TO [webProcessRole];
+
+GO
+GRANT 
+	EXECUTE, 
+	SELECT,
+	INSERT,
+	UPDATE,
+	DELETE, 
+	VIEW DEFINITION ON 
+Schema::[logs] TO [webProcessRole];
+
+GO
+EXEC sp_addrolemember 'webProcessRole', 'webProcessUser';
 GO
 
 GO
