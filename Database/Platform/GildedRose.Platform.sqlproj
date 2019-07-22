@@ -8,7 +8,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{cc71d6bc-c633-415c-902f-193bd3675312}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -61,7 +61,6 @@
     <Folder Include="Schema" />
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />
-    <Folder Include="Storage" />
     <Folder Include="UserDefinedTypes" />
     <Folder Include="Functions" />
     <Folder Include="Views" />
@@ -78,7 +77,6 @@
     <Build Include="Tables\Items.sql" />
     <None Include="GildedRose.Platform.LocalDb.publish.xml" />
     <None Include="PostDeploy\Inventory.ItemsOnHand.sql" />
-    <Build Include="Storage\Inventory.sql" />
     <Build Include="UserDefinedTypes\PWD.sql" />
     <Build Include="UserDefinedTypes\Email.sql" />
     <Build Include="UserDefinedTypes\AuditUser.sql" />
@@ -90,7 +88,6 @@
     <Build Include="UserDefinedTypes\State.sql" />
     <Build Include="UserDefinedTypes\PostalCode.sql" />
     <Build Include="Schema\logs.sql" />
-    <Build Include="Storage\logs.sql" />
     <Build Include="Tables\SQLException.sql" />
     <Build Include="Tables\ApiLog.sql" />
     <Build Include="Views\ItemsView.sql" />
@@ -101,7 +98,6 @@
     <Build Include="Tables\Patrons.sql" />
     <Build Include="Schema\operations.sql" />
     <Build Include="UserDefinedTypes\Phone.sql" />
-    <Build Include="Storage\operations.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Schema\inventory.sql" />
@@ -113,6 +109,7 @@
     <None Include="PostDeploy\Inventory.Categories.sql" />
     <None Include="GildedRose.Platform.VM.publish.xml" />
     <None Include="GildedRose.Platform.publish.xml" />
+    <None Include="GildedRose.Platform.mac.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\ItemsOnHand.sql" />

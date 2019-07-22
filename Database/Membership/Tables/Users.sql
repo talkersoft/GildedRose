@@ -11,7 +11,7 @@
     [CreatedBy] [AuditUser],
 	[Modified] [AuditDate] NULL,
     [ModifiedBy] [AuditUser] NULL, 
-    CONSTRAINT [PK_UserIdentifier] PRIMARY KEY CLUSTERED ([Id] ASC) on [membership],
+    CONSTRAINT [PK_UserIdentifier] PRIMARY KEY CLUSTERED ([Id] ASC),
 	CONSTRAINT [FK_User_Organization] FOREIGN KEY ([OrganizationIdentifier]) REFERENCES [membership].[Organization]([Identifier]), 
 );
 

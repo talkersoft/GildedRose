@@ -34,6 +34,8 @@ namespace GildedRose.Api
         {
             this.env = env;
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentVariableTarget.Machine);
+            environment = environment != null ? environment : "Localhost";
+
             var appParentDirectory = new DirectoryInfo(this.env.ContentRootPath).Parent.FullName;
 
             // Lets not take their word for it and use the environment variable and our own convention
