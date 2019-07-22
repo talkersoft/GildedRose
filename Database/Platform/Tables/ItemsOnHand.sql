@@ -7,7 +7,7 @@
 	[Sold] BIT NOT NULL DEFAULT 0,
 	[Created] [AuditDate] NOT NULL DEFAULT getutcdate(),
     [CreatedBy] [AuditUser] NOT NULL, 
-    CONSTRAINT [PK_ItemOnHandIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) on [inventory],
-	CONSTRAINT [FK_ItemsOnHand_Items] FOREIGN KEY ([ItemIdentifier]) REFERENCES [inventory].[Items]([Identifier]), 
+    CONSTRAINT [PK_ItemOnHandIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC),
+	CONSTRAINT [FK_ItemsOnHand_Items] FOREIGN KEY ([ItemIdentifier]) REFERENCES [inventory].[Items]([Identifier])
 );
  

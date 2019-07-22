@@ -12,5 +12,5 @@
     [CreatedBy] [AuditUser],
 	[Modified] [AuditDate] NULL,
     [ModifiedBy] [AuditUser] NULL, 
-    CONSTRAINT [PK_OrganizationIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) on [membership]
+    CONSTRAINT [PK_OrganizationIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC)
 );

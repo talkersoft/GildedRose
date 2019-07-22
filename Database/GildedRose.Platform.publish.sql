@@ -15,8 +15,8 @@ SET NUMERIC_ROUNDABORT OFF;
 GO
 :setvar DatabaseName "GildedRose.Platform"
 :setvar DefaultFilePrefix "GildedRose.Platform"
-:setvar DefaultDataPath "d:\MSSQL\Data\"
-:setvar DefaultLogPath "d:\MSSQL\Data\"
+:setvar DefaultDataPath ""
+:setvar DefaultLogPath ""
 
 GO
 :on error exit
@@ -51,38 +51,7 @@ END
 GO
 PRINT N'Creating $(DatabaseName)...'
 GO
-CREATE DATABASE [$(DatabaseName)]
-    ON 
-    PRIMARY(NAME = [$(DatabaseName)], FILENAME = N'$(DefaultDataPath)$(DefaultFilePrefix)_Primary.mdf')
-    LOG ON (NAME = [$(DatabaseName)_log], FILENAME = N'$(DefaultLogPath)$(DefaultFilePrefix)_Primary.ldf') COLLATE SQL_Latin1_General_CP1_CI_AS
-GO
-PRINT N'Creating [logs]...';
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILEGROUP [logs];
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILE (NAME = [logs_7F8C9330], FILENAME = N'$(DefaultDataPath)$(DefaultFilePrefix)_logs_7F8C9330.mdf') TO FILEGROUP [logs];
-
-
-GO
-PRINT N'Creating [inventory]...';
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILEGROUP [inventory];
-
-
-GO
-ALTER DATABASE [$(DatabaseName)]
-    ADD FILE (NAME = [inventory_D56827B], FILENAME = N'$(DefaultDataPath)$(DefaultFilePrefix)_inventory_D56827B.mdf') TO FILEGROUP [inventory];
-
-
+CREATE DATABASE [$(DatabaseName)] COLLATE SQL_Latin1_General_CP1_CI_AS
 GO
 USE [$(DatabaseName)];
 
@@ -226,18 +195,7 @@ IF EXISTS (SELECT 1
            WHERE  [name] = N'$(DatabaseName)')
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
-            SET QUERY_STORE (QUERY_CAPTURE_MODE = ALL, DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_PLANS_PER_QUERY = 200, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 367), MAX_STORAGE_SIZE_MB = 100) 
-            WITH ROLLBACK IMMEDIATE;
-    END
-
-
-GO
-IF EXISTS (SELECT 1
-           FROM   [master].[dbo].[sysdatabases]
-           WHERE  [name] = N'$(DatabaseName)')
-    BEGIN
-        ALTER DATABASE [$(DatabaseName)]
-            SET QUERY_STORE = OFF 
+            SET QUERY_STORE (QUERY_CAPTURE_MODE = AUTO, OPERATION_MODE = READ_WRITE, DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_PLANS_PER_QUERY = 200, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), MAX_STORAGE_SIZE_MB = 100) 
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -275,6 +233,36 @@ IF fulltextserviceproperty(N'IsFulltextInstalled') = 1
 
 
 GO
+PRINT N'Creating [webProcessLogin]...';
+
+
+GO
+CREATE LOGIN [webProcessLogin]
+    WITH PASSWORD = N'HappyGoJoyBaby7732';
+
+
+GO
+PRINT N'Creating [webProcessUser]...';
+
+
+GO
+CREATE USER [webProcessUser] FOR LOGIN [webProcessLogin];
+
+
+GO
+REVOKE CONNECT TO [webProcessUser];
+
+
+GO
+PRINT N'Creating [webProcessRole]...';
+
+
+GO
+CREATE ROLE [webProcessRole]
+    AUTHORIZATION [dbo];
+
+
+GO
 PRINT N'Creating [inventory]...';
 
 
@@ -289,6 +277,15 @@ PRINT N'Creating [logs]...';
 
 GO
 CREATE SCHEMA [logs]
+    AUTHORIZATION [dbo];
+
+
+GO
+PRINT N'Creating [operations]...';
+
+
+GO
+CREATE SCHEMA [operations]
     AUTHORIZATION [dbo];
 
 
@@ -338,6 +335,15 @@ CREATE TYPE [dbo].[Email]
 
 
 GO
+PRINT N'Creating [dbo].[Phone]...';
+
+
+GO
+CREATE TYPE [dbo].[Phone]
+    FROM NVARCHAR (255) NOT NULL;
+
+
+GO
 PRINT N'Creating [dbo].[PostalCode]...';
 
 
@@ -365,6 +371,32 @@ CREATE TYPE [dbo].[State]
 
 
 GO
+PRINT N'Creating [inventory].[Categories]...';
+
+
+GO
+CREATE TABLE [inventory].[Categories] (
+    [Id]          INT               IDENTITY (1, 1) NOT NULL,
+    [Name]        NVARCHAR (100)    NOT NULL,
+    [IsLegendary] BIT               NOT NULL,
+    [Created]     [dbo].[AuditDate] NOT NULL,
+    [CreatedBy]   [dbo].[AuditUser] NOT NULL,
+    [Modified]    [dbo].[AuditDate] NULL,
+    [ModifiedBy]  [dbo].[AuditUser] NULL,
+    CONSTRAINT [PK_CategoryIdentifier] PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+
+
+GO
+PRINT N'Creating [inventory].[Categories].[UIX_inventory_category_name]...';
+
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [UIX_inventory_category_name]
+    ON [inventory].[Categories]([Name] ASC);
+
+
+GO
 PRINT N'Creating [inventory].[Items]...';
 
 
@@ -379,7 +411,7 @@ CREATE TABLE [inventory].[Items] (
     [CreatedBy]  [dbo].[AuditUser] NOT NULL,
     [Modified]   [dbo].[AuditDate] NULL,
     [ModifiedBy] [dbo].[AuditUser] NULL,
-    CONSTRAINT [PK_ItemIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) ON [inventory]
+    CONSTRAINT [PK_ItemIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC)
 );
 
 
@@ -389,8 +421,7 @@ PRINT N'Creating [inventory].[Items].[UIX_inventory_item_name]...';
 
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [UIX_inventory_item_name]
-    ON [inventory].[Items]([Name] ASC)
-    ON [inventory];
+    ON [inventory].[Items]([Name] ASC);
 
 
 GO
@@ -416,35 +447,8 @@ CREATE TABLE [inventory].[ItemsOnHand] (
     [Sold]           BIT               NOT NULL,
     [Created]        [dbo].[AuditDate] NOT NULL,
     [CreatedBy]      [dbo].[AuditUser] NOT NULL,
-    CONSTRAINT [PK_ItemOnHandIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC) ON [inventory]
+    CONSTRAINT [PK_ItemOnHandIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC)
 );
-
-
-GO
-PRINT N'Creating [inventory].[Categories]...';
-
-
-GO
-CREATE TABLE [inventory].[Categories] (
-    [Id]          INT               IDENTITY (1, 1) NOT NULL,
-    [Name]        NVARCHAR (100)    NOT NULL,
-    [IsLegendary] BIT               NOT NULL,
-    [Created]     [dbo].[AuditDate] NOT NULL,
-    [CreatedBy]   [dbo].[AuditUser] NOT NULL,
-    [Modified]    [dbo].[AuditDate] NULL,
-    [ModifiedBy]  [dbo].[AuditUser] NULL,
-    CONSTRAINT [PK_CategoryIdentifier] PRIMARY KEY CLUSTERED ([Id] ASC) ON [inventory]
-);
-
-
-GO
-PRINT N'Creating [inventory].[Categories].[UIX_inventory_category_name]...';
-
-
-GO
-CREATE UNIQUE NONCLUSTERED INDEX [UIX_inventory_category_name]
-    ON [inventory].[Categories]([Name] ASC)
-    ON [inventory];
 
 
 GO
@@ -502,6 +506,49 @@ CREATE NONCLUSTERED INDEX [IX_SQLException_ProcedureName]
 
 
 GO
+PRINT N'Creating [operations].[Patrons]...';
+
+
+GO
+CREATE TABLE [operations].[Patrons] (
+    [Identifier] UNIQUEIDENTIFIER   NOT NULL,
+    [FirstName]  NVARCHAR (100)     NOT NULL,
+    [LastName]   NVARCHAR (100)     NOT NULL,
+    [Address1]   [dbo].[Address]    NOT NULL,
+    [Address2]   [dbo].[Address]    NOT NULL,
+    [City]       [dbo].[City]       NOT NULL,
+    [State]      [dbo].[State]      NOT NULL,
+    [PostalCode] [dbo].[PostalCode] NOT NULL,
+    [Phone]      [dbo].[Phone]      NOT NULL,
+    [Email]      [dbo].[Email]      NOT NULL,
+    [IsDeleted]  BIT                NOT NULL,
+    [Created]    [dbo].[AuditDate]  NOT NULL,
+    [CreatedBy]  [dbo].[AuditUser]  NOT NULL,
+    [Modified]   [dbo].[AuditDate]  NULL,
+    [ModifiedBy] [dbo].[AuditUser]  NULL,
+    CONSTRAINT [PK_PatronIdentifier] PRIMARY KEY CLUSTERED ([Identifier] ASC)
+);
+
+
+GO
+PRINT N'Creating [operations].[Patrons].[UIX_inventory_item_name]...';
+
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [UIX_inventory_item_name]
+    ON [operations].[Patrons]([LastName] ASC, [FirstName] ASC);
+
+
+GO
+PRINT N'Creating unnamed constraint on [inventory].[Categories]...';
+
+
+GO
+ALTER TABLE [inventory].[Categories]
+    ADD DEFAULT getutcdate() FOR [Created];
+
+
+GO
 PRINT N'Creating unnamed constraint on [inventory].[Items]...';
 
 
@@ -529,21 +576,21 @@ ALTER TABLE [inventory].[ItemsOnHand]
 
 
 GO
-PRINT N'Creating unnamed constraint on [inventory].[Categories]...';
-
-
-GO
-ALTER TABLE [inventory].[Categories]
-    ADD DEFAULT getutcdate() FOR [Created];
-
-
-GO
 PRINT N'Creating [logs].[DF_SQLException_ErrorDate]...';
 
 
 GO
 ALTER TABLE [logs].[SQLException]
     ADD CONSTRAINT [DF_SQLException_ErrorDate] DEFAULT (getutcdate()) FOR [ErrorDate];
+
+
+GO
+PRINT N'Creating unnamed constraint on [operations].[Patrons]...';
+
+
+GO
+ALTER TABLE [operations].[Patrons]
+    ADD DEFAULT getutcdate() FOR [Created];
 
 
 GO
@@ -598,27 +645,11 @@ SELECT
   WHERE
 	oh.Sold = 0;
 GO
-PRINT N'Creating [dbo].[getCategoryIdByName]...';
+PRINT N'Creating [inventory].[getItemIdentifierByName]...';
 
 
 GO
-CREATE FUNCTION [dbo].[getCategoryIdByName](@CategoryName VARCHAR(100))
-RETURNS INT
-AS
-BEGIN
-	RETURN(SELECT 
-				Id
-			FROM 
-				inventory.Categories
-			WHERE
-				[Name] = @CategoryName);
-END
-GO
-PRINT N'Creating [dbo].[getItemIdentifierByName]...';
-
-
-GO
-CREATE FUNCTION [dbo].[getItemIdentifierByName](@ItemName VARCHAR(100))
+CREATE FUNCTION [inventory].[getItemIdentifierByName](@ItemName VARCHAR(100))
 RETURNS UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -628,6 +659,22 @@ BEGIN
 				inventory.Items
 			WHERE
 				[Name] = @ItemName);
+END
+GO
+PRINT N'Creating [inventory].[getCategoryIdByName]...';
+
+
+GO
+CREATE FUNCTION [inventory].[getCategoryIdByName](@CategoryName VARCHAR(100))
+RETURNS INT
+AS
+BEGIN
+	RETURN(SELECT 
+				Id
+			FROM 
+				inventory.Categories
+			WHERE
+				[Name] = @CategoryName);
 END
 GO
 /*
@@ -691,26 +738,26 @@ DECLARE @Items TABLE (
 INSERT INTO 
 	@Items ([Identifier] ,[Name] ,[Category] ,[ShelfLife] ,[IsDeleted] ,[CreatedBy]) 
 VALUES
-	('f3205dfd-55fe-4cd5-8070-b259e9db2f7b', 'Sword', dbo.getCategoryIdByName('Weapon'), 30, 0, 1),
-	('35096084-af46-4e40-932e-655aab9bac00', 'Axe', dbo.getCategoryIdByName('Weapon'), 40, 0, 1),
-	('e12e2698-79b6-4f15-bfa2-a1fab047aa27', 'Halberd', dbo.getCategoryIdByName('Weapon'), 60, 0, 1),
-	('dddd657e-9617-4c82-bdc5-0ab53b5a6398', 'Aged Brie', dbo.getCategoryIdByName('Food'), 50, 0, 1),
-	('02223851-8f9a-4b55-a925-e59be7855413', 'Aged Milk', dbo.getCategoryIdByName('Food'), 20, 0, 1),
-	('e52e05f0-aba1-44e8-8003-435bb20bd660', 'Mutton', dbo.getCategoryIdByName('Food'), 10, 0, 1),
-	('eea3072c-1579-469a-81c9-f2ba6302a0ca', 'Hand of Ragnaros', dbo.getCategoryIdByName('Sulfuras'), 80, 0, 1),
-	('e2055eae-6d1f-45a9-9701-7c5fbf563e20', 'I am Murloc', dbo.getCategoryIdByName('Backstage Passes'), 20, 0, 1),
-	('960fa030-70ac-4ff7-8ad8-07cea6ca84ce', 'Raging Ogre', dbo.getCategoryIdByName('Backstage Passes'), 10, 0, 1),
-	('95a79f27-61e1-4c70-8039-0fdd703fc6e9', 'Giant Slayer', dbo.getCategoryIdByName('Conjured'), 15, 0, 1),
-	('8686e4d9-a43c-4c46-bb72-81e9454609c6', 'Storm Hammer', dbo.getCategoryIdByName('Conjured'), 20, 0, 1),
-	('3884fae6-6dd9-4e4f-bc04-bcb90f18dae7', 'Belt of Giant Strength', dbo.getCategoryIdByName('Conjured'), 20, 0, 1),
-	('fc22fba7-7f78-4ac5-a155-d89a40a1940a', 'Cheese', dbo.getCategoryIdByName('Food'), 5, 0, 1),
-	('f1ab5859-cd8a-46b2-9520-dd631cbde700', 'Potion of Healing', dbo.getCategoryIdByName('Potion'), 10, 0, 1),
-	('a5091448-6848-4247-8d85-2ee5a6a8defb', 'Bag of Holding', dbo.getCategoryIdByName('Misc'), 10, 0, 1),
-	('58c1acc3-0ce7-4a06-86f3-5052d223e48d', 'TAFKAL80ETC Concert', dbo.getCategoryIdByName('Backstage Passes'), 15, 0, 1),
-	('49ca5c68-4fbd-4ef6-9fe8-e086c6ef81e6', 'Elixir of the Mongoose', dbo.getCategoryIdByName('Potion'), 5, 0, 1),
-	('88bdb452-e23d-4b70-b07e-c9f3f3f0d1a9', '+5 Dexterity Vest', dbo.getCategoryIdByName('Armor'), 10, 0, 1),
-	('15298b70-b493-43a8-b01e-2cccf5514a89', 'Full Plate Mail', dbo.getCategoryIdByName('Armor'), 50, 0, 1),
-	('4bb48e57-245a-419e-880c-1b701dbb35c2', 'Wooden Shield', dbo.getCategoryIdByName('Armor'), 10, 0, 1);
+	('f3205dfd-55fe-4cd5-8070-b259e9db2f7b', 'Sword', inventory.getCategoryIdByName('Weapon'), 30, 0, 1),
+	('35096084-af46-4e40-932e-655aab9bac00', 'Axe', inventory.getCategoryIdByName('Weapon'), 40, 0, 1),
+	('e12e2698-79b6-4f15-bfa2-a1fab047aa27', 'Halberd', inventory.getCategoryIdByName('Weapon'), 60, 0, 1),
+	('dddd657e-9617-4c82-bdc5-0ab53b5a6398', 'Aged Brie', inventory.getCategoryIdByName('Food'), 50, 0, 1),
+	('02223851-8f9a-4b55-a925-e59be7855413', 'Aged Milk', inventory.getCategoryIdByName('Food'), 20, 0, 1),
+	('e52e05f0-aba1-44e8-8003-435bb20bd660', 'Mutton', inventory.getCategoryIdByName('Food'), 10, 0, 1),
+	('eea3072c-1579-469a-81c9-f2ba6302a0ca', 'Hand of Ragnaros', inventory.getCategoryIdByName('Sulfuras'), 80, 0, 1),
+	('e2055eae-6d1f-45a9-9701-7c5fbf563e20', 'I am Murloc', inventory.getCategoryIdByName('Backstage Passes'), 20, 0, 1),
+	('960fa030-70ac-4ff7-8ad8-07cea6ca84ce', 'Raging Ogre', inventory.getCategoryIdByName('Backstage Passes'), 10, 0, 1),
+	('95a79f27-61e1-4c70-8039-0fdd703fc6e9', 'Giant Slayer', inventory.getCategoryIdByName('Conjured'), 15, 0, 1),
+	('8686e4d9-a43c-4c46-bb72-81e9454609c6', 'Storm Hammer', inventory.getCategoryIdByName('Conjured'), 20, 0, 1),
+	('3884fae6-6dd9-4e4f-bc04-bcb90f18dae7', 'Belt of Giant Strength', inventory.getCategoryIdByName('Conjured'), 20, 0, 1),
+	('fc22fba7-7f78-4ac5-a155-d89a40a1940a', 'Cheese', inventory.getCategoryIdByName('Food'), 5, 0, 1),
+	('f1ab5859-cd8a-46b2-9520-dd631cbde700', 'Potion of Healing', inventory.getCategoryIdByName('Potion'), 10, 0, 1),
+	('a5091448-6848-4247-8d85-2ee5a6a8defb', 'Bag of Holding', inventory.getCategoryIdByName('Misc'), 10, 0, 1),
+	('58c1acc3-0ce7-4a06-86f3-5052d223e48d', 'TAFKAL80ETC Concert', inventory.getCategoryIdByName('Backstage Passes'), 15, 0, 1),
+	('49ca5c68-4fbd-4ef6-9fe8-e086c6ef81e6', 'Elixir of the Mongoose', inventory.getCategoryIdByName('Potion'), 5, 0, 1),
+	('88bdb452-e23d-4b70-b07e-c9f3f3f0d1a9', '+5 Dexterity Vest', inventory.getCategoryIdByName('Armor'), 10, 0, 1),
+	('15298b70-b493-43a8-b01e-2cccf5514a89', 'Full Plate Mail', inventory.getCategoryIdByName('Armor'), 50, 0, 1),
+	('4bb48e57-245a-419e-880c-1b701dbb35c2', 'Wooden Shield', inventory.getCategoryIdByName('Armor'), 10, 0, 1);
 
  
 -- Merge Statement Used to ensure list of items maintained in the table variable are persisted into the database
@@ -742,26 +789,26 @@ DECLARE @ItemsOnHand TABLE (
 INSERT INTO 
 	@ItemsOnHand ([Identifier] ,[ItemIdentifier] ,[InitialQuality], [StockDate] ,[CreatedBy]) 
 VALUES
-	('C3289840-3B10-439F-9BC0-DCFB808BDFFE', dbo.getItemIdentifierByName('Bag of Holding'), 50, GETDATE(), 1),
-	('72E15B2E-2062-435E-81FE-A1D815C636F5', dbo.getItemIdentifierByName('I am Murloc'), 10, GETDATE(), 1),
-	('91871496-0CA2-4395-B35E-5E20FF201E23', dbo.getItemIdentifierByName('Full Plate Mail'), 50, GETDATE(), 1),
-	('0715E0BC-6410-4CDF-9F37-2E8910B3D0FD', dbo.getItemIdentifierByName('Elixir of the Mongoose'), 7, GETDATE(), 1),
-	('337D9931-BD01-461E-A251-E6765D7705AD', dbo.getItemIdentifierByName('Mutton'), 10, GETDATE(), 1),
-	('05154EBA-6960-4B28-9F5A-F56FC4D68FC9', dbo.getItemIdentifierByName('Cheese'), 5, GETDATE(), 1),
-	('10ED98DF-7940-47CD-9037-7B1AB6F3108F', dbo.getItemIdentifierByName('Belt of Giant Strength'), 40, GETDATE(), 1),
-	('6E2FD542-B102-4C44-83E3-3F7C19BF9A44', dbo.getItemIdentifierByName('Giant Slayer'), 50, GETDATE(), 1),
-	('04E968B1-7DC1-46EE-9717-6F6132E0690F', dbo.getItemIdentifierByName('Sword'), 50, GETDATE(), 1),
-	('7FB55244-5DCE-4A4D-A063-EEEEC489537B', dbo.getItemIdentifierByName('Raging Ogre'), 10, GETDATE(), 1),
-	('8CC6609B-3907-4999-8D65-AA2BE873A95B', dbo.getItemIdentifierByName('Halberd'), 40, GETDATE(), 1),
-	('C36F2D57-F8CA-4D4B-9908-5485B794D4CC', dbo.getItemIdentifierByName('Hand of Ragnaros'), 80, GETDATE(), 1),
-	('E3C0CABA-5302-4897-886A-BB5C58C90D69', dbo.getItemIdentifierByName('Aged Milk'), 20, GETDATE(), 1),
-	('03C2B461-4254-43AF-BD21-AC677D3F4C87', dbo.getItemIdentifierByName('Potion of Healing'), 10, GETDATE(), 1),
-	('C55E76E7-7FCB-4A95-BF74-9685B78430D5', dbo.getItemIdentifierByName('Storm Hammer'), 50, GETDATE(), 1),
-	('CF3FB7DC-1220-4E57-9405-968C20D737CA', dbo.getItemIdentifierByName('Axe'), 50, GETDATE(), 1),
-	('64BD78B2-C6F7-4EBC-87B4-2C7961F91D2D', dbo.getItemIdentifierByName('+5 Dexterity Vest'), 20, GETDATE(), 1),
-	('9B523CEB-5329-48A7-9355-45B7AB523842', dbo.getItemIdentifierByName('Aged Brie'), 10, GETDATE(), 1),
-	('AEB878B0-7EEE-485D-B088-7ADDD96613FC', dbo.getItemIdentifierByName('Wooden Shield'), 30, GETDATE(), 1),
-	('46637321-E10D-4E77-AAC0-4399840032A8', dbo.getItemIdentifierByName('TAFKAL80ETC Concert'), 20, GETDATE(), 1)
+	('C3289840-3B10-439F-9BC0-DCFB808BDFFE', inventory.getItemIdentifierByName('Bag of Holding'), 50, GETDATE(), 1),
+	('72E15B2E-2062-435E-81FE-A1D815C636F5', inventory.getItemIdentifierByName('I am Murloc'), 10, GETDATE(), 1),
+	('91871496-0CA2-4395-B35E-5E20FF201E23', inventory.getItemIdentifierByName('Full Plate Mail'), 50, GETDATE(), 1),
+	('0715E0BC-6410-4CDF-9F37-2E8910B3D0FD', inventory.getItemIdentifierByName('Elixir of the Mongoose'), 7, GETDATE(), 1),
+	('337D9931-BD01-461E-A251-E6765D7705AD', inventory.getItemIdentifierByName('Mutton'), 10, GETDATE(), 1),
+	('05154EBA-6960-4B28-9F5A-F56FC4D68FC9', inventory.getItemIdentifierByName('Cheese'), 5, GETDATE(), 1),
+	('10ED98DF-7940-47CD-9037-7B1AB6F3108F', inventory.getItemIdentifierByName('Belt of Giant Strength'), 40, GETDATE(), 1),
+	('6E2FD542-B102-4C44-83E3-3F7C19BF9A44', inventory.getItemIdentifierByName('Giant Slayer'), 50, GETDATE(), 1),
+	('04E968B1-7DC1-46EE-9717-6F6132E0690F', inventory.getItemIdentifierByName('Sword'), 50, GETDATE(), 1),
+	('7FB55244-5DCE-4A4D-A063-EEEEC489537B', inventory.getItemIdentifierByName('Raging Ogre'), 10, GETDATE(), 1),
+	('8CC6609B-3907-4999-8D65-AA2BE873A95B', inventory.getItemIdentifierByName('Halberd'), 40, GETDATE(), 1),
+	('C36F2D57-F8CA-4D4B-9908-5485B794D4CC', inventory.getItemIdentifierByName('Hand of Ragnaros'), 80, GETDATE(), 1),
+	('E3C0CABA-5302-4897-886A-BB5C58C90D69', inventory.getItemIdentifierByName('Aged Milk'), 20, GETDATE(), 1),
+	('03C2B461-4254-43AF-BD21-AC677D3F4C87', inventory.getItemIdentifierByName('Potion of Healing'), 10, GETDATE(), 1),
+	('C55E76E7-7FCB-4A95-BF74-9685B78430D5', inventory.getItemIdentifierByName('Storm Hammer'), 50, GETDATE(), 1),
+	('CF3FB7DC-1220-4E57-9405-968C20D737CA', inventory.getItemIdentifierByName('Axe'), 50, GETDATE(), 1),
+	('64BD78B2-C6F7-4EBC-87B4-2C7961F91D2D', inventory.getItemIdentifierByName('+5 Dexterity Vest'), 20, GETDATE(), 1),
+	('9B523CEB-5329-48A7-9355-45B7AB523842', inventory.getItemIdentifierByName('Aged Brie'), 10, GETDATE(), 1),
+	('AEB878B0-7EEE-485D-B088-7ADDD96613FC', inventory.getItemIdentifierByName('Wooden Shield'), 30, GETDATE(), 1),
+	('46637321-E10D-4E77-AAC0-4399840032A8', inventory.getItemIdentifierByName('TAFKAL80ETC Concert'), 20, GETDATE(), 1)
 
 
 
@@ -780,6 +827,37 @@ WHEN MATCHED
 		t.[StockDate] = s.[StockDate]
 WHEN NOT MATCHED BY SOURCE 
     THEN DELETE;
+
+GRANT CONNECT TO [webProcessRole]
+GO
+GRANT 
+	EXECUTE, 
+	SELECT,
+	INSERT,
+	UPDATE,
+	DELETE, 
+	VIEW DEFINITION ON 
+Schema::[dbo] TO [webProcessRole];
+GO
+GRANT 
+	EXECUTE, 
+	SELECT,
+	INSERT,
+	UPDATE,
+	DELETE, 
+	VIEW DEFINITION ON 
+Schema::[inventory] TO [webProcessRole];
+GO
+GRANT 
+	EXECUTE, 
+	SELECT,
+	INSERT,
+	UPDATE,
+	DELETE, 
+	VIEW DEFINITION ON 
+Schema::[logs] TO [webProcessRole];
+
+EXEC sp_addrolemember 'webProcessRole', 'webProcessUser';
 
 GO
 
