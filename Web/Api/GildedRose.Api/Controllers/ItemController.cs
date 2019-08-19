@@ -30,6 +30,19 @@ namespace GildedRose.Api.Controllers
         }
 
         [HttpGet]
+        [Route("getmore")]
+        public async Task<IActionResult> GetMore(string viewByDate)
+        {
+            if (DateTime.TryParse(viewByDate, out DateTime outputDate))
+            {
+                var allItems = await this.itemRepo.GetAll(outputDate);
+                return this.Ok(allItems);
+            }
+
+            return this.NotFound();
+        }
+
+        [HttpGet]
         [Route("name/{itemName}")]
         public async Task<IActionResult> GetByName(string itemName)
         {
